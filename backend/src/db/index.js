@@ -13,5 +13,4 @@ const connectDB = async () => {
         // 1 (or any non-zero number) → Indicates an error or failure occurred.
     }
 }
-
 export default connectDB;
