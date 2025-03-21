@@ -10,7 +10,6 @@ app.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true
 }))
-
 app.use(express.json({limit:"16mb"}))  // Middleware to parse JSON body
 app.use(express.urlencoded({extended: true, limit: "16mb"}))
 app.use(express.static("public")) //  middleware function that serves static files (like HTML, images) from the "public" folder.

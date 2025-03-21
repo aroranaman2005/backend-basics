@@ -1,6 +1,7 @@
-import {v2 as cloudinary} from 'cloudinary';
-import { on } from 'events';
-import fs from "fs";  // fs is file system and is already built in node.js
+import { v2 as cloudinary } from 'cloudinary';
+import fs from "fs";  // fs is used to delete local files if upload fails.
+import dotenv from "dotenv";
+dotenv.config({path: './.env'});
 
 cloudinary.config({ 
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -8,20 +9,29 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const uploadOnCloudinary = async (file) => {
+const uploadOnCloudinary = async (localFilePath) => {
     try {
-        if(!localFilePath) return null;
-        //upload the file on cloudinary
-        const ressponse = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto",
-        })
-        //file has been uploaded on cloudinary
-        console.log("File uploaded on cloudinary", response.url);
+        if (!localFilePath) return null;
+        
+        // Upload the file to Cloudinary
+        const response = await cloudinary.uploader.upload(localFilePath, {
+            resource_type: "auto", // Automatically detects file type (image, video, etc.).
+        });
+
+        // File uploaded successfully
+        console.log("File uploaded on Cloudinary", response.secure_url);
         return response;
+
     } catch (error) {
-        fs.unlinkSync(localFilePath);  //delete the file from local storage as the upload operation failed
+        console.error("Cloudinary Upload Error:", error);
+
+        // Delete the file from local storage only if it exists
+        if (fs.existsSync(localFilePath)) {
+            fs.unlinkSync(localFilePath);
+        }
+        
         return null;
     }
-}
+};
 
-export {uploadOnCloudinary}
+export { uploadOnCloudinary };
